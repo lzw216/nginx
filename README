@@ -1,3 +1,58 @@
+# Building nginx on the Win32 platform with Visual C
 
-Documentation is available at http://nginx.org
+> windows平台编译步骤说明
+
+## Prerequisites
+
+To build nginx on the Microsoft Win32® platform you need:
+
+Microsoft Visual C compiler. Microsoft Visual Studio® 8 and 10 are known to work.
+MSYS.
+Perl, if you want to build OpenSSL® and nginx with SSL support. For example ActivePerl or Strawberry Perl.
+Mercurial client.
+PCRE, zlib and OpenSSL libraries sources.
+
+## Build steps
+
+Ensure that paths to Perl, Mercurial and MSYS bin directories are added to PATH environment variable before you start build. To set Visual C environment run vcvarsall.bat script from Visual C directory.
+
+To build nginx:
+
+Start MSYS bash.
+
+Check out nginx sources from the hg.nginx.org repository. For example:
+
+hg clone http://hg.nginx.org/nginx
+
+Create a build and lib directories, and unpack zlib, PCRE and OpenSSL libraries sources into lib directory:
+
+mkdir objs
+
+mkdir objs/lib
+
+cd objs/lib
+
+tar -xzf ../../pcre-8.32.tar.gz
+
+tar -xzf ../../zlib-1.2.7.tar.gz
+
+tar -xzf ../../openssl-1.0.1e.tar.gz
+
+Run configure script:
+
+auto/configure --with-cc=cl --builddir=objs --prefix= \
+--conf-path=conf/nginx.conf --pid-path=logs/nginx.pid \
+--http-log-path=logs/access.log --error-log-path=logs/error.log \
+--sbin-path=nginx.exe --http-client-body-temp-path=temp/client_body_temp \
+--http-proxy-temp-path=temp/proxy_temp \
+--http-fastcgi-temp-path=temp/fastcgi_temp \
+--with-cc-opt=-DFD_SETSIZE=1024 --with-pcre=objs/lib/pcre-8.32 \
+--with-zlib=objs/lib/zlib-1.2.7 --with-openssl=objs/lib/openssl-1.0.1e \
+--with-select_module --with-http_ssl_module --with-ipv6
+
+Run make:
+
+nmake -f objs/Makefile
+
+##Documentation is available at http://nginx.org
 
